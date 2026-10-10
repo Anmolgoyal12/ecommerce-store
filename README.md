@@ -1,32 +1,34 @@
-# React + TypeScript + Vite
+# NEXUS: AI-Powered E-commerce Framework
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![React](https://img.shields.io/badge/React-19.0-blue.svg)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-purple.svg)](https://vitejs.dev/)
 
-Currently, two official plugins are available:
+NEXUS is an open-source, full-stack developer framework designed to rapidly deploy high-performance, AI-driven e-commerce platforms. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Built for modern developers, bootstrappers, and AI startups, NEXUS provides a complete out-of-the-box infrastructure including a React/Vite frontend, an Express/SQLite backend, and an extensible architecture designed specifically for integrating Large Language Models (LLMs) into the shopping experience (e.g., AI product recommendations, dynamic semantic search, and autonomous customer support agents).
 
-## React Compiler
+## 🚀 Vision
+Our goal is to democratize advanced e-commerce infrastructure. By providing a self-hosted, highly optimized foundation, developers can bypass weeks of boilerplate coding and immediately start building advanced, LLM-powered cloud shopping experiences.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Features
+* **Next-Gen Frontend**: Glassmorphism UI built with React, Vite, and Vanilla CSS.
+* **Integrated API Backend**: Node.js & Express API with SQLite for immediate local development and database modeling.
+* **State Persistence**: Secure local storage handling for cart and user sessions.
+* **AI-Ready Architecture**: Clean, modular component structure designed for easy API hookups to Anthropic Claude or OpenAI for dynamic content generation.
 
-## Expanding the Oxlint configuration
+## 🛠️ Quick Start
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+```bash
+# Clone the repository
+git clone https://github.com/Anmolgoyal12/ecommerce-store.git
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Install dependencies
+npm install
+
+# Run the full-stack environment (Frontend + Backend concurrently)
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 🤝 Contributing
+We welcome contributions from the open-source community! Whether it's adding new AI integrations, optimizing the backend, or enhancing the UI, please submit a pull request.
