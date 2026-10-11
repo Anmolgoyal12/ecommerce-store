@@ -2,7 +2,16 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 
 type Currency = 'INR' | 'USD';
+type ThemeMode = 'cyberpunk' | 'matrix' | 'synthwave' | 'studio';
+
 const USD_RATE = 85;
+
+const THEMES: { id: ThemeMode; label: string; icon: string; color: string }[] = [
+  { id: 'cyberpunk', label: 'Cyberpunk', icon: '⚡', color: '#00f0ff' },
+  { id: 'matrix', label: 'Matrix OLED', icon: '🟢', color: '#10b981' },
+  { id: 'synthwave', label: 'Synthwave', icon: '🌆', color: '#ff2a85' },
+  { id: 'studio', label: 'Studio Light', icon: '☀️', color: '#2563eb' }
+];
 
 const formatPrice = (amountINR: number, currency: Currency) => {
   if (currency === 'USD') {
@@ -31,7 +40,7 @@ type Product = {
   id: number;
   name: string;
   brand: string;
-  category: 'Audio' | 'Wearables' | 'VR & Gaming' | 'Displays';
+  category: 'Audio' | 'Wearables' | 'VR & Gaming' | 'Displays' | 'Computing';
   price: number;
   originalPrice: number;
   discount: string;
@@ -58,6 +67,18 @@ type Order = {
   trackingStep: number;
 };
 
+type SupportTicket = {
+  id: string;
+  name: string;
+  email: string;
+  category: string;
+  priority: string;
+  subject: string;
+  description: string;
+  status: string;
+  date: string;
+};
+
 const INITIAL_PRODUCTS: Product[] = [
   {
     id: 1,
@@ -80,7 +101,7 @@ const INITIAL_PRODUCTS: Product[] = [
       'Microphones': '6 AI Beamforming Mics for voice isolation'
     },
     reviews: [
-      { author: 'Rahul S.', rating: 5, comment: 'Mind-blowing spatial audio separation. The ANC blocks out Bangalore traffic completely.', date: '2 days ago' },
+      { author: 'Rahul S.', rating: 5, comment: 'Mind-blowing spatial audio separation. The ANC blocks out traffic completely.', date: '2 days ago' },
       { author: 'Vikram M.', rating: 5, comment: 'Battery lasts more than a week of full workdays. Premium build quality.', date: '1 week ago' }
     ]
   },
@@ -111,6 +132,80 @@ const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 3,
+    name: 'Nexus Neural Glass AR Pro',
+    brand: 'NEXUS',
+    category: 'Wearables',
+    price: 59999,
+    originalPrice: 69999,
+    discount: '14% off',
+    image: '/ar_glasses.jpg',
+    badge: 'AI OPTICS',
+    rating: 4.9,
+    reviewsCount: 420,
+    description: 'Lightweight titanium augmented reality frames with dual Micro-LED waveguide displays, on-device Claude computer vision, and directional bone-conduction acoustics.',
+    specs: {
+      'Optics': 'Dual Micro-LED Waveguide (1080p per eye, 3000 Nits)',
+      'Vision AI': 'On-device Claude Computer Vision Coprocessor',
+      'Weight': '48g Featherlight Aerospace Titanium',
+      'Battery': '18 Hours Active AR / Magnetic Quick-Snap Charger',
+      'Acoustics': 'Stereo Bone Conduction + Dual Beamforming Mics'
+    },
+    reviews: [
+      { author: 'Rohan D.', rating: 5, comment: 'The HUD visual overlay is crystal clear even in direct sunlight. Feels like Tony Stark gear.', date: '1 day ago' },
+      { author: 'Ananya M.', rating: 5, comment: 'Claude vision instantly identifies components and reads code in front of my eyes.', date: '3 days ago' }
+    ]
+  },
+  {
+    id: 4,
+    name: 'CyberDeck Terminal X7',
+    brand: 'CYBERCORP',
+    category: 'Computing',
+    price: 89999,
+    originalPrice: 99999,
+    discount: '10% off',
+    image: '/cyberdeck.jpg',
+    badge: 'DEV SPECIAL',
+    rating: 4.9,
+    reviewsCount: 215,
+    description: 'Ruggedized modular handheld developer terminal with mechanical ortholinear keyboard, 7" sunlight-readable display, hardware SDR radio, and dual NVMe slots.',
+    specs: {
+      'CPU': 'Octa-Core RISC-V + AI NPU (32 TOPS)',
+      'Memory': '32GB LPDDR5X + 2TB PCIe 4.0 NVMe SSD',
+      'Keyboard': 'Ortholinear Hot-Swappable Mechanical (Kailh Choc)',
+      'Chassis': 'CNC Milled Aluminum 6061 with Cyber-Armor',
+      'Battery': '16,000mAh Hot-Swappable Dual Cell (12h Run Time)'
+    },
+    reviews: [
+      { author: 'Sameer V.', rating: 5, comment: 'The ultimate field terminal for debugging edge models and running terminals anywhere.', date: '4 days ago' },
+      { author: 'Kunal P.', rating: 4.9, comment: 'Mechanical switches on a portable terminal is an absolute dream to type on.', date: '1 week ago' }
+    ]
+  },
+  {
+    id: 5,
+    name: 'Synapse AI Neural Accelerator Hub',
+    brand: 'NEXUS',
+    category: 'Computing',
+    price: 145000,
+    originalPrice: 175000,
+    discount: '17% off',
+    image: '/ai_hub.jpg',
+    badge: 'ENTERPRISE',
+    rating: 5.0,
+    reviewsCount: 64,
+    description: 'Compact desktop neural computing server capable of running 70B parameter LLMs locally at 45 tokens/sec. Liquid cooled with whisper-quiet 18dB acoustics.',
+    specs: {
+      'Neural Compute': '128 TOPS Matrix Tensor Accelerator',
+      'VRAM': '64GB Unified High-Bandwidth VRAM (800 GB/s)',
+      'Thermal System': 'Closed-Loop Vapor Matrix Cooling (< 18dB)',
+      'Connectivity': 'Dual 10GbE + Dual Thunderbolt 5 Ports',
+      'Power Efficiency': '220W Peak (3x more efficient than GPUs)'
+    },
+    reviews: [
+      { author: 'Dr. Aris Thorne', rating: 5, comment: 'Running local Claude checkpoints and code models directly on my desk with zero cloud latency.', date: '5 days ago' }
+    ]
+  },
+  {
+    id: 6,
     name: 'HoloLens VR Headset v2',
     brand: 'VIRTUAL',
     category: 'VR & Gaming',
@@ -134,7 +229,7 @@ const INITIAL_PRODUCTS: Product[] = [
     ]
   },
   {
-    id: 4,
+    id: 7,
     name: 'CyberFit Fitness Tracker',
     brand: 'NEXUS',
     category: 'Wearables',
@@ -157,7 +252,7 @@ const INITIAL_PRODUCTS: Product[] = [
     ]
   },
   {
-    id: 5,
+    id: 8,
     name: 'SonicBoom Noise Cancelling Earbuds',
     brand: 'AUDIOX',
     category: 'Audio',
@@ -180,7 +275,7 @@ const INITIAL_PRODUCTS: Product[] = [
     ]
   },
   {
-    id: 6,
+    id: 9,
     name: 'Aero Watch Active',
     brand: 'VIRTUAL',
     category: 'Wearables',
@@ -203,7 +298,7 @@ const INITIAL_PRODUCTS: Product[] = [
     ]
   },
   {
-    id: 7,
+    id: 10,
     name: 'Smart TV 4K OLED 65"',
     brand: 'VISION',
     category: 'Displays',
@@ -226,7 +321,7 @@ const INITIAL_PRODUCTS: Product[] = [
     ]
   },
   {
-    id: 8,
+    id: 11,
     name: 'NextGen Gaming Console',
     brand: 'PLAYTECH',
     category: 'VR & Gaming',
@@ -255,16 +350,38 @@ function Home({
   addToCart, 
   searchQuery, 
   currency, 
-  onQuickView 
+  onQuickView,
+  onOpenAi
 }: { 
   products: Product[], 
   addToCart: (p: Product) => void, 
   searchQuery: string, 
   currency: Currency,
-  onQuickView: (p: Product) => void 
+  onQuickView: (p: Product) => void,
+  onOpenAi: () => void
 }) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const categories = ['All', 'Audio', 'Wearables', 'VR & Gaming', 'Displays'];
+  const [wishlist, setWishlist] = useState<number[]>(() => {
+    const saved = localStorage.getItem('nexus_wishlist');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const toggleWishlist = (id: number) => {
+    setWishlist(prev => {
+      const next = prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id];
+      localStorage.setItem('nexus_wishlist', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const categories = [
+    { label: 'All', icon: '⚡', count: products.length },
+    { label: 'Wearables', icon: '🕶️', count: products.filter(p => p.category === 'Wearables').length },
+    { label: 'Computing', icon: '💻', count: products.filter(p => p.category === 'Computing').length },
+    { label: 'Audio', icon: '🎧', count: products.filter(p => p.category === 'Audio').length },
+    { label: 'VR & Gaming', icon: '🥽', count: products.filter(p => p.category === 'VR & Gaming').length },
+    { label: 'Displays', icon: '📺', count: products.filter(p => p.category === 'Displays').length }
+  ];
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
@@ -276,7 +393,6 @@ function Home({
     const matchesDesc = p.description.toLowerCase().includes(query);
     const matchesCat = p.category.toLowerCase().includes(query);
     
-    // Budget queries e.g. "under 30000"
     const budgetMatch = query.match(/under\s*(\d+)/i);
     const matchesBudget = budgetMatch ? p.price <= parseInt(budgetMatch[1], 10) : true;
 
@@ -286,86 +402,168 @@ function Home({
   return (
     <main className="main-content">
       <div className="container">
-        <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
-          <div>
-            <h1>Trending <span className="text-gradient">Electronics</span></h1>
-            <p style={{ color: 'var(--text-secondary)' }}>Next-gen gadgets curated for modern technologists.</p>
+        
+        {/* Futuristic Hero Section */}
+        <section className="hero-banner glass">
+          <div className="hero-tag">
+            <span>✨</span> NEXUS QUANTUM OS v2.4 • ON-DEVICE CLAUDE AI
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            <span>⚡ Instant Dispatch</span>
-            <span>•</span>
-            <span>🛡️ 2-Year Warranty</span>
-            <span>•</span>
-            <span>🔒 Encrypted Checkout</span>
-          </div>
-        </div>
+          <h1 className="hero-title">
+            The Next Evolution of <span className="text-gradient">Intelligent Hardware</span>
+          </h1>
+          <p className="hero-desc">
+            Engineered for developers, founders, and tech pioneers. Discover ultra-responsive neural computing, 
+            spatial sensory AR gear, and on-device AI accelerators backed by 2-year express hardware replacement.
+          </p>
 
-        {/* Category Pills */}
-        <div className="category-filter-bar">
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            <a href="#catalog" className="btn btn-primary" style={{ padding: '0.85rem 1.8rem', fontSize: '1.05rem' }}>
+              ⚡ Explore Catalog
+            </a>
+            <button 
+              className="btn" 
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '0.85rem 1.8rem', fontSize: '1.05rem', color: 'var(--text-primary)' }}
+              onClick={onOpenAi}
+            >
+              🤖 Ask Claude Concierge
+            </button>
+          </div>
+
+          <div className="hero-stats-row">
+            <div className="hero-stat-box">
+              <span className="hero-stat-value">&lt; 10ms</span>
+              <span className="hero-stat-label">Inference Latency</span>
+            </div>
+            <div className="hero-stat-box">
+              <span className="hero-stat-value">2 Years</span>
+              <span className="hero-stat-label">Nexus Shield Warranty</span>
+            </div>
+            <div className="hero-stat-box">
+              <span className="hero-stat-value">Same-Day</span>
+              <span className="hero-stat-label">Express Air Dispatch</span>
+            </div>
+            <div className="hero-stat-box">
+              <span className="hero-stat-value">256-Bit</span>
+              <span className="hero-stat-label">Zero-Trust Encrypted</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Category Pills Bar */}
+        <div id="catalog" className="category-filter-bar">
           {categories.map(cat => (
             <button
-              key={cat}
-              className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat)}
+              key={cat.label}
+              className={`category-pill ${selectedCategory === cat.label ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(cat.label)}
             >
-              {cat}
+              <span>{cat.icon}</span>
+              <span>{cat.label}</span>
+              <span style={{ opacity: 0.6, fontSize: '0.8rem' }}>({cat.count})</span>
             </button>
           ))}
         </div>
 
+        {/* Products Grid */}
         <div className="products-grid">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="product-card glass">
-              {product.badge && <span className="product-card-badge">{product.badge}</span>}
-              <div className="product-img-wrapper" style={{ position: 'relative' }}>
-                <img src={product.image} alt={product.name} className="product-img" />
-                <button 
-                  className="quick-view-overlay-btn"
-                  onClick={() => onQuickView(product)}
-                >
-                  👁️ Quick Specs
-                </button>
-              </div>
-              <div className="product-info">
-                <span className="product-brand">{product.brand}</span>
-                <h3 className="product-name" title={product.name} onClick={() => onQuickView(product)} style={{ cursor: 'pointer' }}>
-                  {product.name}
-                </h3>
+          {filteredProducts.map((product) => {
+            const isSaved = wishlist.includes(product.id);
+            return (
+              <div key={product.id} className="product-card glass">
+                {product.badge && <span className="product-card-badge">{product.badge}</span>}
                 
-                <div className="product-rating-row">
-                  <span>★ {product.rating}</span>
-                  <span className="product-rating-count">({product.reviewsCount} verified)</span>
-                </div>
+                {/* Wishlist Button */}
+                <button 
+                  onClick={() => toggleWishlist(product.id)}
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    zIndex: 2,
+                    background: 'rgba(0,0,0,0.4)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: isSaved ? 'var(--danger)' : 'var(--text-secondary)',
+                    fontSize: '1rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title={isSaved ? 'Remove from wishlist' : 'Save to wishlist'}
+                >
+                  {isSaved ? '♥' : '♡'}
+                </button>
 
-                <div className="product-price-row">
-                  <span className="product-price">{formatPrice(product.price, currency)}</span>
-                  <span className="product-original-price">{formatPrice(product.originalPrice, currency)}</span>
-                  <span className="discount-tag">{product.discount}</span>
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
+                <div className="product-img-wrapper">
+                  <img src={product.image} alt={product.name} className="product-img" />
                   <button 
-                    className="btn btn-primary" 
-                    style={{ flex: 1 }}
-                    onClick={() => addToCart(product)}
-                  >
-                    Add to Cart
-                  </button>
-                  <button 
-                    className="btn" 
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-color)', padding: '0.6rem 0.9rem' }}
+                    className="quick-view-overlay-btn"
                     onClick={() => onQuickView(product)}
-                    title="View Specs & Reviews"
                   >
-                    ℹ️
+                    👁️ Quick Specs
                   </button>
+                </div>
+
+                <div className="product-info">
+                  <span className="product-brand">{product.brand}</span>
+                  <h3 
+                    className="product-name" 
+                    title={product.name} 
+                    onClick={() => onQuickView(product)} 
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {product.name}
+                  </h3>
+                  
+                  <div className="product-rating-row">
+                    <span>★ {product.rating}</span>
+                    <span className="product-rating-count">({product.reviewsCount} reviews)</span>
+                  </div>
+
+                  <div className="stock-indicator">
+                    <span className="stock-dot"></span>
+                    <span>In Stock • Ready to Ship</span>
+                  </div>
+
+                  <div className="product-price-row">
+                    <span className="product-price">{formatPrice(product.price, currency)}</span>
+                    <span className="product-original-price">{formatPrice(product.originalPrice, currency)}</span>
+                    <span className="discount-tag">{product.discount}</span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.6rem', marginTop: 'auto' }}>
+                    <button 
+                      className="btn btn-primary" 
+                      style={{ flex: 1 }}
+                      onClick={() => addToCart(product)}
+                    >
+                      Add to Cart
+                    </button>
+                    <button 
+                      className="btn" 
+                      style={{ 
+                        background: 'var(--bg-secondary)', 
+                        border: '1px solid var(--border-color)', 
+                        padding: '0.6rem 0.9rem',
+                        color: 'var(--text-primary)'
+                      }}
+                      onClick={() => onQuickView(product)}
+                      title="View Specs & Verified Reviews"
+                    >
+                      ℹ️
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {filteredProducts.length === 0 && (
             <p style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '3rem', color: 'var(--text-secondary)' }}>
-              No products found for "{searchQuery}". Try searching for <em>"Headphones"</em>, <em>"Smartwatch"</em>, or <em>"under 30000"</em>.
+              No products found for "{searchQuery}". Try searching for <em>"AR Glasses"</em>, <em>"CyberDeck"</em>, or <em>"AI Hub"</em>.
             </p>
           )}
         </div>
@@ -417,9 +615,9 @@ function Checkout({
             <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
             <h1 style={{ color: 'var(--accent-color)', marginBottom: '0.5rem' }}>Order Placed!</h1>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-              Your order <strong style={{ color: '#fff' }}>#{placedOrder.id}</strong> has been confirmed and routed to logistics.
+              Your order <strong style={{ color: 'var(--text-primary)' }}>#{placedOrder.id}</strong> has been secured and routed to BlueDart Air.
             </p>
-            <div style={{ background: 'rgba(255,255,255,0.04)', padding: '1rem', borderRadius: '8px', marginBottom: '2rem', textAlign: 'left', fontSize: '0.9rem' }}>
+            <div style={{ background: 'var(--bg-secondary)', padding: '1.2rem', borderRadius: '10px', marginBottom: '2rem', textAlign: 'left', fontSize: '0.9rem', border: '1px solid var(--border-color)' }}>
               <div>📦 <strong>Status:</strong> {placedOrder.status}</div>
               <div style={{ marginTop: '0.4rem' }}>🚚 <strong>Carrier:</strong> {placedOrder.courier}</div>
               <div style={{ marginTop: '0.4rem' }}>💰 <strong>Total Paid:</strong> {formatPrice(placedOrder.totalINR, currency)}</div>
@@ -498,6 +696,11 @@ function Checkout({
 
 function App() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    return (localStorage.getItem('nexus_theme') as ThemeMode) || 'cyberpunk';
+  });
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+
   const [currency, setCurrency] = useState<Currency>(() => {
     return (localStorage.getItem('nexus_currency') as Currency) || 'INR';
   });
@@ -529,6 +732,27 @@ function App() {
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [supportTab, setSupportTab] = useState<'ticket' | 'faq' | 'contact'>('ticket');
+  const [activeFaq, setActiveFaq] = useState<number | null>(0);
+
+  const [tickets, setTickets] = useState<SupportTicket[]>(() => {
+    const saved = localStorage.getItem('nexus_tickets');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: 'NX-TCK-8921',
+        name: 'Anmol Goyal',
+        email: 'founder@anmolnexus.in',
+        category: 'Hardware Warranty',
+        priority: 'Normal',
+        subject: 'Inquiry regarding Quantum X1 replacement earcups',
+        description: 'Need extra ear cushion sets for studio mixing.',
+        status: 'Resolved • Dispatched Replacement Set',
+        date: 'Oct 10, 2026'
+      }
+    ];
+  });
+
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -541,10 +765,26 @@ function App() {
   const [aiMessages, setAiMessages] = useState<{ sender: 'bot' | 'user', text: string, suggestedProduct?: Product }[]>([
     {
       sender: 'bot',
-      text: '👋 Greetings! I am Nexus AI Concierge, powered by Claude 3.5 Sonnet. How can I assist you with specs, recommendations, or deals today?'
+      text: '👋 Greetings! I am Nexus AI Concierge, powered by Claude 3.5 Sonnet. How can I assist you with neural hardware specs, AR optics, or computing clusters today?'
     }
   ]);
   const [aiInput, setAiInput] = useState('');
+
+  // Toast Notification state
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(prev => prev === msg ? null : prev);
+    }, 2800);
+  };
+
+  // Sync theme to document element
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('nexus_theme', theme);
+  }, [theme]);
 
   // Fetch products from backend with graceful fallback
   useEffect(() => {
@@ -552,7 +792,6 @@ function App() {
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          // Merge with detailed specs
           const merged = data.map((d: any, idx: number) => ({
             ...INITIAL_PRODUCTS[idx % INITIAL_PRODUCTS.length],
             ...d
@@ -579,12 +818,23 @@ function App() {
   }, [orders]);
 
   useEffect(() => {
+    localStorage.setItem('nexus_tickets', JSON.stringify(tickets));
+  }, [tickets]);
+
+  useEffect(() => {
     if (user) {
       localStorage.setItem('nexus_user', JSON.stringify(user));
     } else {
       localStorage.removeItem('nexus_user');
     }
   }, [user]);
+
+  const handleThemeChange = (newTheme: ThemeMode) => {
+    setTheme(newTheme);
+    setIsThemeMenuOpen(false);
+    const found = THEMES.find(t => t.id === newTheme);
+    showToast(`🎨 Switched to ${found?.label || newTheme} Theme`);
+  };
 
   const addToCart = (product: Product, quantity = 1) => {
     setCart((prevCart) => {
@@ -596,6 +846,7 @@ function App() {
       }
       return [...prevCart, { ...product, quantity }];
     });
+    showToast(`🛒 Added "${product.name}" to cart`);
     setIsCartOpen(true);
   };
 
@@ -618,6 +869,26 @@ function App() {
   const handleOrderComplete = (newOrder: Order) => {
     setOrders(prev => [newOrder, ...prev]);
     setCart([]);
+    showToast(`🎉 Order #${newOrder.id} placed successfully!`);
+  };
+
+  const handleTicketSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = e.target as any;
+    const newTicket: SupportTicket = {
+      id: `NX-TCK-${Math.floor(10000 + Math.random() * 90000)}`,
+      name: target.name.value,
+      email: target.email.value,
+      category: target.category.value,
+      priority: target.priority.value,
+      subject: target.subject.value,
+      description: target.description.value,
+      status: 'Investigating • Assigned to AI Engineering Pod',
+      date: 'Just now'
+    };
+    setTickets(prev => [newTicket, ...prev]);
+    showToast(`📨 Ticket #${newTicket.id} submitted! Expected reply in 15 mins.`);
+    target.reset();
   };
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -638,6 +909,7 @@ function App() {
           const data = await res.json();
           setUser({ name: data.name, email: data.email });
           setIsAuthModalOpen(false);
+          showToast(`👋 Welcome to Nexus, ${data.name}!`);
           return;
         }
       } else {
@@ -650,6 +922,7 @@ function App() {
           const data = await res.json();
           setUser({ name: data.name, email: data.email });
           setIsAuthModalOpen(false);
+          showToast(`👋 Welcome back, ${data.name}!`);
           return;
         }
       }
@@ -659,6 +932,7 @@ function App() {
     const displayName = target.fullName ? target.fullName.value : email.split('@')[0];
     setUser({ name: displayName || 'Tech Founder', email });
     setIsAuthModalOpen(false);
+    showToast(`👋 Logged in as ${displayName || 'Tech Founder'}`);
   };
 
   // AI Concierge response generator
@@ -670,27 +944,32 @@ function App() {
     setAiMessages(newMsgs);
     setAiInput('');
 
-    // Generate response using semantic intent matching
     setTimeout(() => {
       const lower = text.toLowerCase();
       let botResponse = '';
       let suggested: Product | undefined;
 
-      if (lower.includes('headphone') || lower.includes('quantum') || lower.includes('noise')) {
+      if (lower.includes('glass') || lower.includes('ar') || lower.includes('optics')) {
+        suggested = INITIAL_PRODUCTS[2]; // Nexus Neural Glass
+        botResponse = `The **Nexus Neural Glass AR Pro** is our breakthrough spatial computing wearable! Weighing only 48g, it projects dual 1080p Micro-LED waveguides and includes on-device Claude computer vision for live object detection and document analysis.`;
+      } else if (lower.includes('cyberdeck') || lower.includes('terminal') || lower.includes('linux') || lower.includes('dev')) {
+        suggested = INITIAL_PRODUCTS[3]; // CyberDeck Terminal X7
+        botResponse = `The **CyberDeck Terminal X7** is the developer's ultimate portable rig. It features an ortholinear hot-swappable mechanical keyboard, 32GB RAM, octa-core RISC-V with AI NPU, and CNC-milled 6061 aluminum armor!`;
+      } else if (lower.includes('server') || lower.includes('hub') || lower.includes('accelerator') || lower.includes('local llm')) {
+        suggested = INITIAL_PRODUCTS[4]; // Synapse AI Neural Accelerator
+        botResponse = `The **Synapse AI Neural Accelerator Hub** delivers 128 TOPS of local neural tensor performance. It runs 70B parameter models at 45 tokens/sec right on your desk with silent vapor-chamber liquid cooling!`;
+      } else if (lower.includes('headphone') || lower.includes('quantum') || lower.includes('noise')) {
         suggested = INITIAL_PRODUCTS[0];
-        botResponse = `The **Quantum X1 Wireless Headphones** are our top recommendation for acoustic precision. They deliver 65 hours of battery life and active hybrid noise cancellation (-45dB) tuned for high-focus environments.`;
+        botResponse = `The **Quantum X1 Wireless Headphones** are our top recommendation for acoustic precision with 65 hours of battery life and active hybrid noise cancellation (-45dB).`;
       } else if (lower.includes('fitness') || lower.includes('watch') || lower.includes('smartwatch')) {
         suggested = INITIAL_PRODUCTS[1];
         botResponse = `For serious athletics and biometric tracking, the **Titanium Smartwatch Pro Max** features aerospace grade 5 titanium, medical ECG, and multi-band dual GPS with a 14-day battery.`;
       } else if (lower.includes('budget') || lower.includes('cheap') || lower.includes('under') || lower.includes('deal')) {
-        suggested = INITIAL_PRODUCTS[3]; // CyberFit
+        suggested = INITIAL_PRODUCTS[6]; // CyberFit
         botResponse = `Looking for the best value? The **CyberFit Fitness Tracker** is currently 33% off at ${formatPrice(9999, currency)}. It weighs only 18g and offers 21 days of continuous battery life!`;
-      } else if (lower.includes('game') || lower.includes('vr') || lower.includes('hololens')) {
-        suggested = INITIAL_PRODUCTS[2];
-        botResponse = `For next-generation immersion, the **HoloLens VR Headset v2** features dual 4K Micro-OLED displays with 120Hz smooth refresh rate and neural hand tracking.`;
       } else {
-        suggested = INITIAL_PRODUCTS[0];
-        botResponse = `Based on your interest, I recommend exploring our flagship **Quantum X1 Wireless Headphones** or the **Titanium Smartwatch Pro Max**. Both feature industry-leading hardware and 2-year express warranty.`;
+        suggested = INITIAL_PRODUCTS[2];
+        botResponse = `Explore our flagship **Nexus Neural Glass AR Pro** or the **CyberDeck Terminal X7** for cutting-edge computing. All products are backed by our 2-Year Nexus Shield warranty and same-day air dispatch!`;
       }
 
       setAiMessages([...newMsgs, { sender: 'bot', text: botResponse, suggestedProduct: suggested }]);
@@ -699,34 +978,104 @@ function App() {
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPriceINR = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const activeThemeObj = THEMES.find(t => t.id === theme) || THEMES[0];
+
+  const faqs = [
+    {
+      q: '🛡️ What is covered under the 2-Year Nexus Shield Warranty?',
+      a: 'Nexus Shield provides full coverage against manufacturing defects, accidental sensor damage, and battery degradation below 80%. If your hardware develops an issue, our courier conducts an express doorstep hardware swap within 48 business hours.'
+    },
+    {
+      q: '🤖 How does Claude AI work on Nexus Neural Hardware?',
+      a: 'Nexus devices utilize dedicated low-power NPUs for sub-10ms edge inference. For heavy multi-modal reasoning, the hardware seamlessly falls back to Anthropic Claude 3.5 Sonnet cloud APIs via encrypted zero-trust tunnels.'
+    },
+    {
+      q: '🚚 What are the delivery timelines across India and internationally?',
+      a: 'Metro areas (Delhi-NCR, Mumbai, Bengaluru, Hyderabad) receive same-day or next-morning air express delivery via BlueDart. Other Indian regions receive delivery in 2 business days. Worldwide international shipping via DHL Express arrives in 3-5 days.'
+    },
+    {
+      q: '🔄 What is the return and refund policy?',
+      a: 'We offer a 30-day no-questions-asked refund guarantee. Simply initiate a return from the Support Portal, and our logistics partner will pick up the package with full prepaid insurance.'
+    }
+  ];
 
   return (
     <BrowserRouter>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="toast-container">
+          <div className="toast-item">
+            <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
+
       {/* Navbar */}
       <nav className="navbar">
         <div className="container">
           <Link to="/" className="nav-logo" onClick={() => setIsCartOpen(false)}>
-            NEXUS<span className="text-accent">.</span>
+            <span>NEXUS</span><span className="text-accent">.</span>
           </Link>
           
           <div className="search-bar">
             <input 
               type="text" 
               className="search-input" 
-              placeholder="Search products, brands, 'under 30000', or specs..."
+              placeholder="Search AR glasses, cyberdeck, AI hub, specs, or 'under 30000'..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
           <div className="nav-actions">
+            {/* Multiple Theme Mode Selector */}
+            <div className="theme-picker-container">
+              <button 
+                className="theme-picker-btn"
+                onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+                title="Change theme palette"
+              >
+                <span>{activeThemeObj.icon}</span>
+                <span>{activeThemeObj.label}</span>
+                <span style={{ fontSize: '0.65rem' }}>▼</span>
+              </button>
+
+              {isThemeMenuOpen && (
+                <div className="theme-dropdown glass">
+                  {THEMES.map(t => (
+                    <button
+                      key={t.id}
+                      className={`theme-option-btn ${theme === t.id ? 'active' : ''}`}
+                      onClick={() => handleThemeChange(t.id)}
+                    >
+                      <span className="theme-color-dot" style={{ backgroundColor: t.color }}></span>
+                      <span>{t.icon} {t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Currency Switcher */}
             <button 
               className="currency-btn"
-              onClick={() => setCurrency(currency === 'INR' ? 'USD' : 'INR')}
+              onClick={() => {
+                const next = currency === 'INR' ? 'USD' : 'INR';
+                setCurrency(next);
+                showToast(`💱 Currency changed to ${next}`);
+              }}
               title="Click to toggle currency"
             >
               {currency === 'INR' ? '🇮🇳 ₹ INR' : '🇺🇸 $ USD'}
+            </button>
+
+            {/* Support Portal Button */}
+            <button 
+              className="orders-nav-btn"
+              onClick={() => setIsSupportOpen(true)}
+              title="Help Center, Warranty & Support"
+            >
+              🎧 Support
             </button>
 
             {/* Orders Button */}
@@ -746,9 +1095,18 @@ function App() {
                 Login
               </button>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                <span style={{ fontWeight: 600, color: 'var(--accent-color)', fontSize: '0.9rem' }}>Hi, {user.name}</span>
-                <button className="login-btn" onClick={() => setUser(null)} style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}>Logout</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <span style={{ fontWeight: 600, color: 'var(--accent-color)', fontSize: '0.85rem' }}>Hi, {user.name}</span>
+                <button 
+                  className="login-btn" 
+                  onClick={() => {
+                    setUser(null);
+                    showToast('Logged out');
+                  }} 
+                  style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
+                >
+                  Logout
+                </button>
               </div>
             )}
             
@@ -770,6 +1128,7 @@ function App() {
               searchQuery={searchQuery} 
               currency={currency}
               onQuickView={(p) => setSelectedProduct(p)}
+              onOpenAi={() => setIsAiOpen(true)}
             />
           } 
         />
@@ -785,6 +1144,178 @@ function App() {
         />
       </Routes>
 
+      {/* Support & Help Portal Modal */}
+      {isSupportOpen && (
+        <div className="modal-overlay open" onClick={() => setIsSupportOpen(false)}>
+          <div className="support-modal glass" onClick={e => e.stopPropagation()}>
+            <button className="close-modal-btn" onClick={() => setIsSupportOpen(false)}>&times;</button>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.2rem' }}>
+              <div>
+                <h2>Nexus Engineering & Hardware Support</h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                  Enterprise SLA: 15-Minute Guaranteed AI Response • 24/7 Dedicated Hardware Engineers
+                </p>
+              </div>
+              <div style={{ background: 'rgba(0, 240, 255, 0.1)', border: '1px solid var(--accent-color)', padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.8rem', color: 'var(--accent-color)', fontWeight: 700 }}>
+                ⚡ Systems Operational • 99.98% SLA
+              </div>
+            </div>
+
+            <div className="support-nav-pills">
+              <button 
+                className={`support-pill-btn ${supportTab === 'ticket' ? 'active' : ''}`}
+                onClick={() => setSupportTab('ticket')}
+              >
+                📝 Submit Ticket ({tickets.length})
+              </button>
+              <button 
+                className={`support-pill-btn ${supportTab === 'faq' ? 'active' : ''}`}
+                onClick={() => setSupportTab('faq')}
+              >
+                ❓ Knowledge Base & FAQs
+              </button>
+              <button 
+                className={`support-pill-btn ${supportTab === 'contact' ? 'active' : ''}`}
+                onClick={() => setSupportTab('contact')}
+              >
+                📞 Direct Founder Channels
+              </button>
+            </div>
+
+            {supportTab === 'ticket' && (
+              <div className="support-grid">
+                <div>
+                  <h3 style={{ marginBottom: '1rem' }}>Open an Engineering Ticket</h3>
+                  <form onSubmit={handleTicketSubmit} className="support-card">
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                      <div style={{ flex: 1 }}>
+                        <label className="form-label">Full Name</label>
+                        <input type="text" name="name" className="form-input" required defaultValue={user ? user.name : "Anmol Goyal"} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label className="form-label">Email Address</label>
+                        <input type="email" name="email" className="form-input" required defaultValue={user ? user.email : "founder@anmolnexus.in"} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                      <div style={{ flex: 1 }}>
+                        <label className="form-label">Category</label>
+                        <select name="category" className="form-input" style={{ cursor: 'pointer' }}>
+                          <option value="Hardware Warranty">🛡️ Hardware Warranty & Swap</option>
+                          <option value="Order Logistics">🚚 Order Delivery & Logistics</option>
+                          <option value="Claude AI SDK">🤖 Claude AI SDK & API Access</option>
+                          <option value="Enterprise Purchase">🏢 Enterprise & Bulk Inquiries</option>
+                        </select>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label className="form-label">Priority</label>
+                        <select name="priority" className="form-input" style={{ cursor: 'pointer' }}>
+                          <option value="High">🔴 High (Production Critical)</option>
+                          <option value="Normal">🟡 Normal (Standard Inquiries)</option>
+                          <option value="Low">🟢 Low (General Feedback)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '1rem' }}>
+                      <label className="form-label">Subject / Issue Summary</label>
+                      <input type="text" name="subject" className="form-input" placeholder="e.g. Firmware update guidance for Neural Glass AR" required />
+                    </div>
+
+                    <div style={{ marginBottom: '1.2rem' }}>
+                      <label className="form-label">Technical Details / Logs</label>
+                      <textarea name="description" className="form-input" rows={3} placeholder="Describe what you observed or what assistance is required..." required style={{ resize: 'vertical' }}></textarea>
+                    </div>
+
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                      ⚡ Dispatch Ticket to Nexus Engineering
+                    </button>
+                  </form>
+                </div>
+
+                <div>
+                  <h3 style={{ marginBottom: '1rem' }}>Active Support Tickets</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '420px', overflowY: 'auto' }}>
+                    {tickets.map(t => (
+                      <div key={t.id} className="support-card" style={{ padding: '1.2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                          <strong style={{ color: 'var(--accent-color)' }}>{t.id}</strong>
+                          <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.06)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{t.date}</span>
+                        </div>
+                        <h4 style={{ fontSize: '0.95rem', marginBottom: '0.3rem' }}>{t.subject}</h4>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.8rem' }}>{t.description}</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.5rem' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>{t.category}</span>
+                          <span style={{ color: 'var(--success)', fontWeight: 600 }}>● {t.status}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {supportTab === 'faq' && (
+              <div className="faq-list">
+                {faqs.map((f, fIdx) => (
+                  <div key={fIdx} className="faq-item">
+                    <div className="faq-question" onClick={() => setActiveFaq(activeFaq === fIdx ? null : fIdx)}>
+                      <span>{f.q}</span>
+                      <span style={{ color: 'var(--accent-color)', fontSize: '1.2rem' }}>{activeFaq === fIdx ? '−' : '+'}</span>
+                    </div>
+                    {activeFaq === fIdx && (
+                      <div className="faq-answer">
+                        {f.a}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {supportTab === 'contact' && (
+              <div>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+                  Direct escalations reach our executive engineering desk. For enterprise partnership, Claude API grants, or custom hardware runs, reach out via the channels below:
+                </p>
+
+                <div className="contact-channels-grid">
+                  <a href="mailto:founder@anmolnexus.in" className="contact-channel-card">
+                    <div style={{ fontSize: '1.8rem' }}>✉️</div>
+                    <strong style={{ fontSize: '1.05rem' }}>Founder Direct Email</strong>
+                    <span style={{ color: 'var(--accent-color)', fontSize: '0.9rem' }}>founder@anmolnexus.in</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Direct inbox monitored by founder. PGP encrypted.</span>
+                  </a>
+
+                  <div className="contact-channel-card" style={{ cursor: 'pointer' }} onClick={() => { setIsSupportOpen(false); setIsAiOpen(true); }}>
+                    <div style={{ fontSize: '1.8rem' }}>🤖</div>
+                    <strong style={{ fontSize: '1.05rem' }}>Claude 3.5 AI Concierge</strong>
+                    <span style={{ color: 'var(--accent-color)', fontSize: '0.9rem' }}>Instant AI Hardware Diagnostics</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Real-time recommendation, compatibility, and troubleshooting.</span>
+                  </div>
+
+                  <a href="https://github.com/Anmolgoyal12/ecommerce-store/issues" target="_blank" rel="noreferrer" className="contact-channel-card">
+                    <div style={{ fontSize: '1.8rem' }}>🐙</div>
+                    <strong style={{ fontSize: '1.05rem' }}>GitHub Issue Tracker</strong>
+                    <span style={{ color: 'var(--accent-color)', fontSize: '0.9rem' }}>Anmolgoyal12 / ecommerce-store</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>File bugs, feature requests, and open-source contributions.</span>
+                  </a>
+
+                  <div className="contact-channel-card">
+                    <div style={{ fontSize: '1.8rem' }}>🛡️</div>
+                    <strong style={{ fontSize: '1.05rem' }}>Physical Lab Dispatch</strong>
+                    <span style={{ color: 'var(--accent-color)', fontSize: '0.9rem' }}>Sector 62, Noida, NCR, India</span>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Hardware quality inspection & cleanroom calibration facility.</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Product Quick-View Modal */}
       {selectedProduct && (
         <div className="modal-overlay open" onClick={() => setSelectedProduct(null)}>
@@ -794,9 +1325,10 @@ function App() {
             <div className="quick-view-grid">
               <div>
                 <img src={selectedProduct.image} alt={selectedProduct.name} className="quick-view-img" />
-                <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.03)', padding: '0.8rem', borderRadius: '8px', fontSize: '0.85rem' }}>
-                  <div>🛡️ <strong>Official Warranty:</strong> 2 Years Nexus Shield</div>
-                  <div style={{ marginTop: '0.3rem' }}>🚚 <strong>Free Shipping:</strong> Same day dispatch via Air Express</div>
+                <div style={{ marginTop: '1rem', background: 'var(--bg-card)', padding: '0.9rem', borderRadius: '10px', fontSize: '0.85rem', border: '1px solid var(--border-color)' }}>
+                  <div>🛡️ <strong>Official Warranty:</strong> 2 Years Nexus Shield Extended</div>
+                  <div style={{ marginTop: '0.4rem' }}>🚚 <strong>Free Shipping:</strong> Same day dispatch via BlueDart Air</div>
+                  <div style={{ marginTop: '0.4rem' }}>🔄 <strong>30-Day Hassle-Free Returns:</strong> No questions asked</div>
                 </div>
               </div>
 
@@ -806,11 +1338,11 @@ function App() {
                 
                 <div className="product-rating-row" style={{ fontSize: '1rem', marginBottom: '1rem' }}>
                   <span>★ {selectedProduct.rating}</span>
-                  <span className="product-rating-count">({selectedProduct.reviewsCount} customer reviews)</span>
+                  <span className="product-rating-count">({selectedProduct.reviewsCount} verified customer reviews)</span>
                 </div>
 
                 <div className="product-price-row" style={{ marginBottom: '1.2rem' }}>
-                  <span className="product-price" style={{ fontSize: '1.8rem' }}>{formatPrice(selectedProduct.price, currency)}</span>
+                  <span className="product-price" style={{ fontSize: '2rem' }}>{formatPrice(selectedProduct.price, currency)}</span>
                   <span className="product-original-price">{formatPrice(selectedProduct.originalPrice, currency)}</span>
                   <span className="discount-tag">{selectedProduct.discount}</span>
                 </div>
@@ -848,14 +1380,14 @@ function App() {
 
             {/* Reviews Section */}
             <div className="reviews-section">
-              <h4 style={{ marginBottom: '1rem' }}>Customer Feedback ({selectedProduct.reviews.length} Featured)</h4>
+              <h4 style={{ marginBottom: '1rem' }}>Verified Customer Feedback ({selectedProduct.reviews.length} Featured)</h4>
               {selectedProduct.reviews.map((rev, idx) => (
                 <div key={idx} className="review-item">
                   <div className="review-header">
                     <strong>{rev.author} <span style={{ color: 'var(--accent-color)', fontSize: '0.75rem' }}>✔ Verified Purchaser</span></strong>
                     <span style={{ color: 'var(--text-secondary)' }}>{rev.date}</span>
                   </div>
-                  <div style={{ color: '#ffb703', fontSize: '0.8rem', marginBottom: '0.3rem' }}>
+                  <div style={{ color: '#fbbf24', fontSize: '0.8rem', marginBottom: '0.3rem' }}>
                     {'★'.repeat(Math.floor(rev.rating))}
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{rev.comment}</p>
@@ -907,7 +1439,7 @@ function App() {
                     🚚 <strong>Logistics Partner:</strong> {order.courier}
                   </div>
 
-                  <div style={{ marginTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                  <div style={{ marginTop: '0.8rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
                     <span>{order.items.length} item(s)</span>
                     <strong style={{ color: 'var(--accent-color)' }}>{formatPrice(order.totalINR, currency)}</strong>
                   </div>
@@ -951,16 +1483,16 @@ function App() {
                   <div className="ai-product-suggestion">
                     <img src={msg.suggestedProduct.image} alt={msg.suggestedProduct.name} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {msg.suggestedProduct.name}
                       </div>
-                      <div style={{ color: 'var(--accent-color)', fontSize: '0.8rem', fontWeight: 600 }}>
+                      <div style={{ color: 'var(--accent-color)', fontSize: '0.8rem', fontWeight: 700 }}>
                         {formatPrice(msg.suggestedProduct.price, currency)}
                       </div>
                     </div>
                     <button 
                       className="btn btn-primary" 
-                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
+                      style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}
                       onClick={() => {
                         if (msg.suggestedProduct) {
                           addToCart(msg.suggestedProduct);
@@ -977,10 +1509,10 @@ function App() {
 
           <div className="ai-prompt-chips">
             {[
-              '🎧 Headphone recommendations',
-              '⌚ Watch for fitness',
-              '💰 Best gear under ₹30,000',
-              '⚡ VR Headset specs'
+              '🕶️ Nexus Neural Glass AR specs',
+              '💻 CyberDeck Terminal X7',
+              '🧠 Synapse AI Accelerator Hub',
+              '💰 Best hardware under ₹30,000'
             ].map(prompt => (
               <button key={prompt} className="ai-chip" onClick={() => handleAiSend(prompt)}>
                 {prompt}
